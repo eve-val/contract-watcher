@@ -19,6 +19,7 @@ from evelink import corp, api, eve
 import datetime
 import jinja2
 import os
+from keys import keyid, vcode #put your desired api keys in a file named keys.py
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)), 
@@ -26,8 +27,6 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        keyid = 'ASK'
-        vcode = 'ALI'
         key = api.API(api_key = (keyid,vcode))
         knees = corp.Corp(key)
         contracts = knees.contracts()
@@ -85,7 +84,7 @@ class MainHandler(webapp2.RequestHandler):
         lprior = sorted(lprior, key=lambda contract: contract['date'])
 
         template = JINJA_ENVIRONMENT.get_template('index.html')
-        self.response.write(template.render({'hpcontracts': hprior,})) 
+        self.response.write(template.render({'hpcontracts': hprior, 'medpcontracts':medprior, 'lowpcontracts':lprior,})) 
                     
         
 app = webapp2.WSGIApplication([
