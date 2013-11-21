@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 import webapp2
-from evelink import corp, api, eve
+import evelink
 import datetime
 import jinja2
 import os
@@ -25,66 +25,91 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)), 
     extensions=['jinja2.ext.autoescape'])
 
+# Ideally this would come from the corporation sheet, but we'd need a key with
+# that bit set.
+KNEES_ID = 98237970
+
+# Ideally this would come from the CCP database dump, but thpppbbbtttt.
+# Constructed manually instead.
+supported_locs = {
+    60011824: "Orvolle I",
+    60011731: "Orvolle VI-1",
+    60012067: "Murethand VIII-2",
+    60009808: "Mesybier VII",
+    60009940: "LSC4-P I",
+    60013477: "VLGD-R III-2",
+    # TODO: Adacyne IV-14
+    # TODO: Chardalane V
+}
+other_locs = {
+    60008494: "Amarr",
+    60003760: "Jita",
+}
+
+def location_display_from_id(loc_id):
+    """Get the display name for the location."""
+    if loc_id in supported_locs:
+        return supported_locs[loc_id]
+    if loc_id in other_locs:
+        return other_locs[loc_id] + "?!!"
+    return "[%s]" % loc_id
+
+def location_display_from_comment(comment):
+    if "LSC" in comment: return "LSC4-P"
+    if "VLG" in comment: return "VLGD-R"
+    return "???"
+
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        key = api.API(api_key = (keyid,vcode))
-        knees = corp.Corp(key)
+        eve = evelink.eve.EVE()
+        knees = evelink.corp.Corp(evelink.api.API(api_key = (keyid,vcode)))
         contracts = knees.contracts()
 
-        hprior = []
-        medprior = []
-        lprior = []
-        for key in contracts:
-            contract = contracts[key]
-            if not contract['completed']:
-                if not contract['status'] == 'Deleted':
-                    cn = {}
-                    thing = eve.EVE()
-                    cn['issued'] = thing.character_names_from_ids([contract['issuer']])[contract['issuer']]
-                    if contract['accepted']:
-                        cn['accepted'] = thing.character_names_from_ids([contract['acceptor']])[contract['acceptor']]
-                    else:
-                        cn['accepted'] = "None"
-                    cn['volume'] = contract['volume']
-                    cn['date'] = datetime.datetime.fromtimestamp(contract['issued'])
-                    if contract['reward'] >= 30000000:
-                        maxdays = datetime.timedelta(days=2)
-                        delta = cn['date'] + maxdays - datetime.datetime.today()
-                        cn['remaining'] = str(delta.days) + 'd ' + str(delta.seconds/(60*60)) + 'h'
-                        if delta.days < 1:
-                            if delta.seconds/(60*60) < 12 or delta.days < 0:
-                                cn['class'] = 'text-error'
-                            else:
-                                cn['class'] = 'text-warning'
-                        else:
-                            cn['class'] = 'text-info'
-                        cn['dateissued'] = cn['date'].strftime("%d-%m-%y %H:%M")
-                        hprior.append(cn)
-                    elif contract['reward'] >= 15000000:
-                        maxdays = datetime.timedelta(days=5)
-                        delta = cn['date'] + maxdays - datetime.datetime.today()
-                        cn['remaining'] = str(delta.days) + 'd ' + str(delta.seconds/(60*60)) + 'h'
-                        if delta.days < 1:
-                            if delta.seconds/(60*60) < 12 or delta.days < 0:
-                                cn['class'] = 'text-error'
-                            else:
-                                cn['class'] = 'text-warning'
-                        else:
-                            cn['class'] = 'text-info'
-                        cn['dateissued'] = cn['date'].strftime("%d-%m-%y %H:%M")
-                        medprior.append(cn)
-                    else:
-                        cn['remaining'] = ''
-                        cn['class'] = 'text-info'
-                        cn['dateissued'] = cn['date'].strftime("%d-%m-%y %H:%M")
-                        lprior.append(cn)
+        pending = []
+        for contract in contracts.itervalues():
+            if (contract['assignee'] == KNEES_ID and
+                    contract['status'] in ('Outstanding', 'InProgress')):
+                cn = {}
 
-        hprior = sorted(hprior, key=lambda contract: contract['date'])
-        medprior = sorted(medprior, key=lambda contract: contract['date'])
-        lprior = sorted(lprior, key=lambda contract: contract['date'])
+                # Basic info
+                cn['type'] = contract['type']
+                cn['status'] = contract['status']
+                cn['issuer'] = eve.character_name_from_id(contract['issuer'])
+                date = datetime.datetime.fromtimestamp(contract['issued'])
+                cn['dateissued'] = date.strftime("%Y-%m-%d %H:%M")
+                cn['volume'] = "{:,.3f}".format(contract['volume'])
+
+                # Source and destination
+                cn['from'] = location_display_from_id(contract['start'])
+                if contract['type'] == 'Courier':
+                    cn['to'] = location_display_from_id(contract['end'])
+                else:
+                    cn['to'] = location_display_from_comment(contract['title'])
+
+                # Accepter
+                if contract['accepted']:
+                    cn['accepted'] = eve.character_name_from_id(contract['acceptor'])
+                else:
+                    cn['accepted'] = ""
+
+                # Time remaining
+                maxdays = datetime.timedelta(days=3)
+                delta = date + maxdays - datetime.datetime.today()
+                cn['timedelta_remaining'] = delta
+                cn['remaining'] = str(delta.days) + 'd ' + str(delta.seconds/(60*60)) + 'h'
+                if delta < datetime.timedelta(hours=12):
+                    cn['class'] = 'text-error'
+                elif delta < datetime.timedelta(days=1):
+                    cn['class'] = 'text-warning'
+                else:
+                    cn['class'] = 'text-info'
+
+                pending.append(cn)
+
+        pending = sorted(pending, key=lambda contract: contract['timedelta_remaining'])
 
         template = JINJA_ENVIRONMENT.get_template('index.html')
-        self.response.write(template.render({'hpcontracts': hprior, 'medpcontracts':medprior, 'lowpcontracts':lprior,})) 
+        self.response.write(template.render({'pending': pending}))
                     
         
 app = webapp2.WSGIApplication([
