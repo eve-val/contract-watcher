@@ -55,8 +55,8 @@ def location_display_from_id(loc_id):
     return "[%s]" % loc_id
 
 def location_display_from_comment(comment):
-    if "LSC" in comment: return "LSC4-P"
-    if "VLG" in comment: return "VLGD-R"
+    if "LSC" in comment: return "LSC4-P I"
+    if "VLG" in comment: return "VLGD-R III-2"
     return "???"
 
 class MainHandler(webapp2.RequestHandler):
