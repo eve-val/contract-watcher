@@ -78,6 +78,7 @@ class MainHandler(webapp2.RequestHandler):
                 date = datetime.datetime.fromtimestamp(contract['issued'])
                 cn['dateissued'] = date.strftime("%Y-%m-%d %H:%M")
                 cn['volume'] = "{:,.3f}".format(contract['volume'])
+                cn['accepted'] = "Yes" if contract['accepted'] else ""
 
                 # Source and destination
                 cn['from'] = location_display_from_id(contract['start'])
@@ -85,12 +86,6 @@ class MainHandler(webapp2.RequestHandler):
                     cn['to'] = location_display_from_id(contract['end'])
                 else:
                     cn['to'] = location_display_from_comment(contract['title'])
-
-                # Accepter
-                if contract['accepted']:
-                    cn['accepted'] = eve.character_name_from_id(contract['acceptor'])
-                else:
-                    cn['accepted'] = ""
 
                 # Time remaining
                 maxdays = datetime.timedelta(days=3)
