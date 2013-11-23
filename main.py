@@ -59,6 +59,21 @@ def location_display_from_comment(comment):
     if "VLG" in comment: return "VLGD-R III-2"
     return "???"
 
+def timedelta_display(delta):
+    # timedeltas are normalized like:
+    # 0 <= microseconds < 1000000
+    # 0 <= seconds < 3600*24 (the number of seconds in one day)
+    # -999999999 <= days <= 999999999
+    if delta < datetime.timedelta(0):
+        minus_maybe = "-"
+        days = abs(delta.days + 1)
+        seconds = 60 * 60 * 24 - delta.seconds
+    else:
+        minus_maybe = ""
+        days = delta.days
+        seconds = delta.seconds
+    return "%s%dd %dh" % (minus_maybe, days, seconds / (60 * 60))
+
 class MainHandler(webapp2.RequestHandler):
     def get(self):
         eve = evelink.eve.EVE()
@@ -91,7 +106,7 @@ class MainHandler(webapp2.RequestHandler):
                 maxdays = datetime.timedelta(days=3)
                 delta = date + maxdays - datetime.datetime.today()
                 cn['timedelta_remaining'] = delta
-                cn['remaining'] = str(delta.days) + 'd ' + str(delta.seconds/(60*60)) + 'h'
+                cn['remaining'] = timedelta_display(delta)
                 if delta < datetime.timedelta(hours=12):
                     cn['class'] = 'text-error'
                 elif delta < datetime.timedelta(days=1):
