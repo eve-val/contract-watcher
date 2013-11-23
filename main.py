@@ -38,8 +38,8 @@ supported_locs = {
     60009808: "Mesybier VII",
     60009940: "LSC4-P I",
     60013477: "VLGD-R III-2",
+    60014575: "Chardalane V",
     # TODO: Adacyne IV-14
-    # TODO: Chardalane V
 }
 other_locs = {
     60008494: "Amarr",
