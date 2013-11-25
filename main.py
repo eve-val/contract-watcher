@@ -39,9 +39,10 @@ supported_locs = {
     60009940: "LSC4-P I",
     60013477: "VLGD-R III-2",
     60014575: "Chardalane V",
-    # TODO: Adacyne IV-14
+    60011725: "Adacyne IV-14",
 }
 other_locs = {
+    60011728: "Adacyne III-14",
     60008494: "Amarr",
     60003760: "Jita",
 }
