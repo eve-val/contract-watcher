@@ -40,11 +40,11 @@ supported_locs = {
     60013477: "VLGD-R III-2",
     60014575: "Chardalane V",
     60011725: "Adacyne IV-14",
+    60003760: "Jita IV-4",
 }
 other_locs = {
     60011728: "Adacyne III-14",
     60008494: "Amarr",
-    60003760: "Jita",
 }
 
 def location_display_from_id(loc_id):
