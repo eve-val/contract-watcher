@@ -84,7 +84,8 @@ class MainHandler(webapp2.RequestHandler):
         pending = []
         for contract in contracts.itervalues():
             if (contract['assignee'] == KNEES_ID and
-                    contract['status'] in ('Outstanding', 'InProgress')):
+                contract['status'] in ('Outstanding', 'InProgress') and
+                'opsec' not in contract['title']) :
                 cn = {}
 
                 # Basic info
