@@ -45,6 +45,8 @@ supported_locs = {
 other_locs = {
     60011728: "Adacyne III-14",
     60008494: "Amarr",
+    61000223: "KW-I6T VI",
+    60006511: "Mendori IX - Moon 9 - Imperial Armaments Factory",
 }
 
 def location_display_from_id(loc_id):
