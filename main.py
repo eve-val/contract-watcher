@@ -32,20 +32,21 @@ KNEES_ID = 98237970
 # Ideally this would come from the CCP database dump, but thpppbbbtttt.
 # Constructed manually instead.
 supported_locs = {
+    60003760: "Jita IV-4",
+    60011725: "Adacyne IV-14",
+    60009940: "LSC4-P I",
+    60008494: "Amarr VIII",
+    60006262: "Rayl VIII-7",
+    61000223: "KW-I6T VI",
+}
+other_locs = {
     60011824: "Orvolle I",
     60011731: "Orvolle VI-1",
     60012067: "Murethand VIII-2",
     60009808: "Mesybier VII",
-    60009940: "LSC4-P I",
     60013477: "VLGD-R III-2",
     60014575: "Chardalane V",
-    60011725: "Adacyne IV-14",
-    60003760: "Jita IV-4",
-}
-other_locs = {
     60011728: "Adacyne III-14",
-    60008494: "Amarr",
-    61000223: "KW-I6T VI",
     60006511: "Mendori IX - Moon 9 - Imperial Armaments Factory",
 }
 
