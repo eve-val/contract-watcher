@@ -32,12 +32,9 @@ KNEES_ID = 98237970
 # Ideally this would come from the CCP database dump, but thpppbbbtttt.
 # Constructed manually instead.
 supported_locs = {
-    60003760: "Jita IV-4",
-    60011725: "Adacyne IV-14",
-    60009940: "LSC4-P I",
     60008494: "Amarr VIII",
     60006262: "Rayl VIII-7",
-    61000223: "KW-I6T VI",
+    61000682: "EX6-AO VII",
 }
 other_locs = {
     60011824: "Orvolle I",
@@ -48,6 +45,10 @@ other_locs = {
     60014575: "Chardalane V",
     60011728: "Adacyne III-14",
     60006511: "Mendori IX - Moon 9 - Imperial Armaments Factory",
+    61000223: "KW-I6T VI",
+    60003760: "Jita IV-4",
+    60011725: "Adacyne IV-14",
+    60009940: "LSC4-P I",
 }
 
 def location_display_from_id(loc_id):
