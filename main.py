@@ -33,8 +33,8 @@ KNEES_ID = 98237970
 # Constructed manually instead.
 supported_locs = {
     60008494: "Amarr VIII",
-    60006262: "Rayl VIII-7",
-    61000682: "EX6-AO VII",
+    60003616: "Dabrid V",
+    61000744: "4-07MU V",
 }
 other_locs = {
     60011824: "Orvolle I",
@@ -49,6 +49,8 @@ other_locs = {
     60003760: "Jita IV-4",
     60011725: "Adacyne IV-14",
     60009940: "LSC4-P I",
+    60006262: "Rayl VIII-7",
+    61000682: "EX6-AO VII",
 }
 
 def location_display_from_id(loc_id):
