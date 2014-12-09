@@ -9,4 +9,10 @@ contract-watcher needs [evelink](https://github.com/eve-val/evelink) to interfac
     git clone https://github.com/eve-val/evelink.git evelink-repo
     ln -s evelink-repo/evelink
 
+It also expects [Eve Shipping Calc](https://github.com/kormat/eve-shipping-calc):
+
+    git clone https://github.com/kormat/eve-shipping-calc.git calc
+
+Configure calc/calc-config.js for your routes.
+
 You'll need to fill in keys.py with your API key.

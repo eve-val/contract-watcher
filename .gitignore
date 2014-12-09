@@ -1,5 +1,6 @@
 .*.swp
 *.pyc
+calc/
 evelink
 evelink-repo/
 keys.py
