@@ -88,7 +88,7 @@ class MainHandler(webapp2.RequestHandler):
         contracts = knees.contracts()
 
         pending = []
-        for contract in contracts.itervalues():
+        for contract in contracts.result.itervalues():
             if (contract['assignee'] == KNEES_ID and
                 contract['status'] in ('Outstanding', 'InProgress') and
                 'opsec' not in contract['title'].lower()) :
@@ -97,7 +97,7 @@ class MainHandler(webapp2.RequestHandler):
                 # Basic info
                 cn['type'] = contract['type']
                 cn['status'] = contract['status']
-                cn['issuer'] = eve.character_name_from_id(contract['issuer'])
+                cn['issuer'] = eve.character_name_from_id(contract['issuer']).result
                 date = datetime.datetime.fromtimestamp(contract['issued'])
                 cn['dateissued'] = date.strftime("%Y-%m-%d %H:%M")
                 cn['volume'] = "{:,.3f}".format(contract['volume'])
