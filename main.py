@@ -19,7 +19,8 @@ import evelink
 import datetime
 import jinja2
 import os
-from keys import keyid, vcode #put your desired api keys in a file named keys.py
+import config
+from config import keyid, vcode #put your desired api keys in a file named config.py
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)), 
@@ -133,7 +134,9 @@ class MainHandler(webapp2.RequestHandler):
         pending = sorted(pending, key=lambda contract: contract['timedelta_remaining'])
 
         template = JINJA_ENVIRONMENT.get_template('index.html')
-        self.response.write(template.render({'pending': pending}))
+        self.response.write(template.render({'pending': pending,
+                                             'doc_url': config.doc_url,
+                                            }))
                     
         
 app = webapp2.WSGIApplication([
