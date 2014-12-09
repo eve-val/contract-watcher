@@ -111,7 +111,7 @@ class MainHandler(webapp2.RequestHandler):
 
                 # Accepter
                 if contract['accepted']:
-                    cn['accepted'] = eve.character_name_from_id(contract['acceptor'])
+                    cn['accepted'] = eve.character_name_from_id(contract['acceptor']).result
                 else:
                     cn['accepted'] = ""
 
