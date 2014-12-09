@@ -28,6 +28,7 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 # Ideally this would come from the corporation sheet, but we'd need a key with
 # that bit set.
 KNEES_ID = 98237970
+SLA_DAYS = 7
 
 # Ideally this would come from the CCP database dump, but thpppbbbtttt.
 # Constructed manually instead.
@@ -116,7 +117,7 @@ class MainHandler(webapp2.RequestHandler):
                     cn['accepted'] = ""
 
                 # Time remaining
-                maxdays = datetime.timedelta(days=3)
+                maxdays = datetime.timedelta(days=SLA_DAYS)
                 delta = date + maxdays - datetime.datetime.today()
                 cn['timedelta_remaining'] = delta
                 cn['remaining'] = timedelta_display(delta)
