@@ -28,6 +28,7 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 # Ideally this would come from the corporation sheet, but we'd need a key with
 # that bit set.
 KNEES_ID = 98237970
+SLA_DAYS = 7
 
 # Ideally this would come from the CCP database dump, but thpppbbbtttt.
 # Constructed manually instead.
@@ -88,7 +89,7 @@ class MainHandler(webapp2.RequestHandler):
         contracts = knees.contracts()
 
         pending = []
-        for contract in contracts.itervalues():
+        for contract in contracts.result.itervalues():
             if (contract['assignee'] == KNEES_ID and
                 contract['status'] in ('Outstanding', 'InProgress') and
                 'opsec' not in contract['title'].lower()) :
@@ -97,7 +98,7 @@ class MainHandler(webapp2.RequestHandler):
                 # Basic info
                 cn['type'] = contract['type']
                 cn['status'] = contract['status']
-                cn['issuer'] = eve.character_name_from_id(contract['issuer'])
+                cn['issuer'] = eve.character_name_from_id(contract['issuer']).result
                 date = datetime.datetime.fromtimestamp(contract['issued'])
                 cn['dateissued'] = date.strftime("%Y-%m-%d %H:%M")
                 cn['volume'] = "{:,.3f}".format(contract['volume'])
@@ -111,12 +112,12 @@ class MainHandler(webapp2.RequestHandler):
 
                 # Accepter
                 if contract['accepted']:
-                    cn['accepted'] = eve.character_name_from_id(contract['acceptor'])
+                    cn['accepted'] = eve.character_name_from_id(contract['acceptor']).result
                 else:
                     cn['accepted'] = ""
 
                 # Time remaining
-                maxdays = datetime.timedelta(days=3)
+                maxdays = datetime.timedelta(days=SLA_DAYS)
                 delta = date + maxdays - datetime.datetime.today()
                 cn['timedelta_remaining'] = delta
                 cn['remaining'] = timedelta_display(delta)
