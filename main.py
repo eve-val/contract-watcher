@@ -90,6 +90,7 @@ class MainHandler(webapp2.RequestHandler):
         contracts = knees.contracts()
 
         pending = []
+        total_volume = 0.0
         for contract in contracts.result.itervalues():
             if (contract['assignee'] == KNEES_ID and
                 contract['status'] in ('Outstanding', 'InProgress') and
@@ -103,6 +104,7 @@ class MainHandler(webapp2.RequestHandler):
                 date = datetime.datetime.fromtimestamp(contract['issued'])
                 cn['dateissued'] = date.strftime("%Y-%m-%d %H:%M")
                 cn['volume'] = "{:,.3f}".format(contract['volume'])
+                total_volume += contact['volume']
 
                 # Source and destination
                 cn['from'] = location_display_from_id(contract['start'])
@@ -136,6 +138,7 @@ class MainHandler(webapp2.RequestHandler):
         template = JINJA_ENVIRONMENT.get_template('index.html')
         self.response.write(template.render({'pending': pending,
                                              'doc_url': config.doc_url,
+                                             'total_volume': total_volume,
                                             }))
                     
         
