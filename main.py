@@ -138,7 +138,7 @@ class MainHandler(webapp2.RequestHandler):
         template = JINJA_ENVIRONMENT.get_template('index.html')
         self.response.write(template.render({'pending': pending,
                                              'doc_url': config.doc_url,
-                                             'total_volume': total_volume,
+                                             'total_volume': "{:,.3f}".format(total_volume),
                                             }))
                     
         
