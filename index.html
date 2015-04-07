@@ -12,27 +12,38 @@
         <div class="row">
             <div class="span12">
                 <table class="table">
-                <tr>
-                    <td>For</td>
-                    <td>Type</td>
-                    <td>From</td>
-                    <td>To</td>
-                    <td>Accepted By</td>
-                    <td>Volume</td>
-                    <td>Date Issued</td>
-                    <td>Time Remaining</td>
-                </tr>
-                {% for contract in pending %}
-                <tr class="{{ contract.class }}">
-                    <td>{{ contract.issuer }}</td>
-                    <td>{{ contract.type }}</td>
-                    <td>{{ contract.from }}</td>
-                    <td>{{ contract.to }}</td>
-                    <td>{{ contract.accepted }}</td>
-                    <td style="text-align: right">{{ contract.volume }}</td>
-                    <td>{{ contract.dateissued }}</td>
-                    <td>{{ contract.remaining }}</td>
-                </tr>
+                    <thead>
+                        <tr>
+                            <td>For</td>
+                            <td>Type</td>
+                            <td>From</td>
+                            <td>To</td>
+                            <td>Accepted By</td>
+                            <td>Volume</td>
+                            <td>Date Issued</td>
+                            <td>Time Remaining</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for contract in pending %}
+                        <tr class="{{ contract.class }}">
+                            <td>{{ contract.issuer }}</td>
+                            <td>{{ contract.type }}</td>
+                            <td>{{ contract.from }}</td>
+                            <td>{{ contract.to }}</td>
+                            <td>{{ contract.accepted }}</td>
+                            <td style="text-align: right">{{ contract.volume }}</td>
+                            <td>{{ contract.dateissued }}</td>
+                            <td>{{ contract.remaining }}</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td style="text-align: right" colspan="5">Total Volume:</td>
+                            <td style="text-align: right">{{ total_volume }}</td>
+                            <td colspan="2">&nbsp;</td>
+                        </tr>
+                    </tfoot>
                 {% endfor %}
                 </table>
             </div>
