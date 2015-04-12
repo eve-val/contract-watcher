@@ -104,7 +104,7 @@ class MainHandler(webapp2.RequestHandler):
                 date = datetime.datetime.fromtimestamp(contract['issued'])
                 cn['dateissued'] = date.strftime("%Y-%m-%d %H:%M")
                 cn['volume'] = "{:,.3f}".format(contract['volume'])
-                total_volume += contact['volume']
+                total_volume += contract['volume']
 
                 # Source and destination
                 cn['from'] = location_display_from_id(contract['start'])
