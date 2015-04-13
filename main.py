@@ -15,11 +15,14 @@
 # limitations under the License.
 #
 import webapp2
+import webapp2_extras.auth
+import webapp2_extras.sessions
 import evelink
 import datetime
 import jinja2
 import os
 import os.path
+import sys
 import config
 from config import keyid, vcode #put your desired api keys in a file named config.py
 
@@ -38,6 +41,8 @@ supported_locs = {
     60008494: "Amarr VIII",
     60003616: "Dabrid V",
     61000744: "4-07MU V",
+    60013957: "Parses",
+    60014940: "UHKL-N",
 }
 other_locs = {
     60011824: "Orvolle I",
@@ -86,6 +91,15 @@ def timedelta_display(delta):
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
+        if config.require_login:
+            auth = get_auth(self.request)
+            user = auth.get_user_by_session()
+            if user is None:
+                return self.redirect('/login')
+            if config.braveapi_perm_view not in user['perms']:
+                self.response.write("permission denied :(")
+                return
+
         cache = config.get_evelink_cache() if config.get_evelink_cache else None
         api = evelink.api.API(api_key = (keyid,vcode), cache=cache)
         knees = evelink.corp.Corp(api)
@@ -144,6 +158,70 @@ class MainHandler(webapp2.RequestHandler):
                                              'total_volume': "{:,.3f}".format(total_volume),
                                             }))
 
+def get_auth(request):
+    auth_store_config = {
+        'user_model': 'auth.Character',
+        'user_attributes': ['perms'],
+    }
+    auth_store = webapp2_extras.auth.AuthStore(app, config=auth_store_config)
+    webapp2_extras.auth.set_store(auth_store)
+    return webapp2_extras.auth.get_auth(request=request)
+
+def get_brave_api():
+    import braveapi.client
+    from binascii import unhexlify
+    from hashlib import sha256
+    from ecdsa.keys import SigningKey, VerifyingKey
+    from ecdsa.curves import NIST256p
+
+    endpoint = config.braveapi_endpoint
+    my_id = config.braveapi_my_id
+    my_privkey = SigningKey.from_string(unhexlify(config.braveapi_my_privkey), curve=NIST256p, hashfunc=sha256)
+    server_pubkey = VerifyingKey.from_string(unhexlify(config.braveapi_server_pubkey), curve=NIST256p, hashfunc=sha256)
+
+    return braveapi.client.API(endpoint, my_id, my_privkey, server_pubkey)
+
+
+class LoginHandler(webapp2.RequestHandler):
+    def get(self):
+        auth = get_auth(self.request)
+        user = auth.get_user_by_session()
+        if user is not None:
+            return webapp2.redirect("/")
+        api = get_brave_api()
+        success = self.request.host_url + '/loginok'
+        failure = self.request.host_url + '/login'
+        result = api.core.authorize(success=success, failure=failure)
+        return webapp2.redirect(result.location)
+
+
+class LoginResultHandler(webapp2.RequestHandler):
+    def get(self):
+        auth = get_auth(self.request)
+        user = auth.get_user_by_session()
+        if user is not None:
+            return webapp2.redirect("/")
+        token = self.request.GET['token']
+        api = get_brave_api()
+        info = api.core.info(token)
+        session_info = {
+            'user_id': info['character']['id'],
+            'perms': info['perms'],
+        }
+        auth.set_session(session_info)
+        session_store = webapp2_extras.sessions.get_store(request=self.request)
+        session_store.save_sessions(self.response)
+        return webapp2.redirect("/", response=self.response)
+
+
+class LogoutHandler(webapp2.RequestHandler):
+    def get(self):
+        auth = get_auth(self.request)
+        auth.unset_session()
+        session_store = webapp2_extras.sessions.get_store(request=self.request)
+        session_store.save_sessions(self.response)
+        return webapp2.redirect("/", response=self.response)
+
 
 class StaticHandler(webapp2.RequestHandler):
     """Try to have your frontend serve static assets instead of this. But, this
@@ -165,13 +243,21 @@ class StaticHandler(webapp2.RequestHandler):
         with open(path) as f:
             self.response.write(f.read())
 
-        
+
+app_config = {}
+app_config['webapp2_extras.sessions'] = {
+    'secret_key': config.session_secret_key,
+}
+
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
+    ('/login', LoginHandler),
+    ('/loginok', LoginResultHandler),
+    ('/logout', LogoutHandler),
     ('/css/.*', StaticHandler),
     ('/img/.*', StaticHandler),
     ('/js/.*', StaticHandler),
-], debug=config.debug)
+], debug=config.debug, config=app_config)
 
 
 def main():

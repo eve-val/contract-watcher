@@ -19,3 +19,16 @@ get_evelink_cache=None
 # standalone.
 host='127.0.0.1'
 port='8091'
+
+# Optional configuration. Include these cont 
+require_login=True
+
+braveapi_endpoint='http://core.example.com/api'
+braveapi_my_privkey='................................................................'
+braveapi_my_pubkey='................................................................................................................................'
+braveapi_my_id='........................'
+braveapi_server_pubkey='................................................................................................................................'
+
+braveapi_perm_view='yourapp.view'
+
+session_secret_key='................................'

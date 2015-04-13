@@ -9,6 +9,7 @@ setup(
         'evelink',
         'jinja2',
         'paste',
+        'requests', # shame on braveapi for not declaring the dependency.
         'webapp2',
         'webob',  # shame on webapp2 for not declaring the dependency.
     ],
