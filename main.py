@@ -19,6 +19,7 @@ import evelink
 import datetime
 import jinja2
 import os
+import os.path
 import config
 from config import keyid, vcode #put your desired api keys in a file named config.py
 
@@ -85,8 +86,10 @@ def timedelta_display(delta):
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        eve = evelink.eve.EVE()
-        knees = evelink.corp.Corp(evelink.api.API(api_key = (keyid,vcode)))
+        cache = config.get_evelink_cache() if config.get_evelink_cache else None
+        api = evelink.api.API(api_key = (keyid,vcode), cache=cache)
+        knees = evelink.corp.Corp(api)
+        eve = evelink.eve.EVE(api)
         contracts = knees.contracts()
 
         pending = []
@@ -140,8 +143,40 @@ class MainHandler(webapp2.RequestHandler):
                                              'doc_url': config.doc_url,
                                              'total_volume': "{:,.3f}".format(total_volume),
                                             }))
-                    
+
+
+class StaticHandler(webapp2.RequestHandler):
+    """Try to have your frontend serve static assets instead of this. But, this
+    is available for easy standalone operation."""
+    def get_resource_path(self):
+        """This is responsible for making sure that the requested resource
+        refers to something inside the static directory."""
+        path = self.request.path.lstrip('/')
+        abspath = os.path.abspath(os.path.join('static', path))
+        relpath = os.path.relpath(abspath, os.path.dirname(__file__))
+        if not relpath.startswith('static/'):
+            self.abort(404)
+        return relpath
+
+    def get(self):
+        path = self.get_resource_path()
+        # Let the browser guess the content type.
+        self.response.content_type = None
+        with open(path) as f:
+            self.response.write(f.read())
+
         
 app = webapp2.WSGIApplication([
-    ('/', MainHandler)
+    ('/', MainHandler),
+    ('/css/.*', StaticHandler),
+    ('/img/.*', StaticHandler),
+    ('/js/.*', StaticHandler),
 ], debug=True)
+
+
+def main():
+    from paste import httpserver
+    httpserver.serve(app, host=config.host, port=config.port)
+
+if __name__ == '__main__':
+    main()
