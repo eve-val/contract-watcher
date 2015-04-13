@@ -1,3 +1,5 @@
+NOTE: this readme is a bit out of date. TODO(jboning)
+
 This app provides a contract queue for an alliance JF service. The corp API key used to pull has been stripped. To get your own, talk to Nolan Inkura.
 
 ## Dependencies & Setup
