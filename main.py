@@ -171,7 +171,7 @@ app = webapp2.WSGIApplication([
     ('/css/.*', StaticHandler),
     ('/img/.*', StaticHandler),
     ('/js/.*', StaticHandler),
-], debug=True)
+], debug=config.debug)
 
 
 def main():
