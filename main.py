@@ -191,7 +191,7 @@ class LogoutHandler(webapp2.RequestHandler):
 class StaticHandler(webapp2.RequestHandler):
     # We'll try to find requested resource relative to this location (relative
     # to directory this source file's in).
-    SERVE_FROM_DIRECTORY = 'static'
+    SERVE_FROM_DIRECTORY = os.path.join(os.path.dirname(__file__), 'static')
     # Once we resolve a requested resource (relative to the directory this
     # source file's in), the path must begin with this prefix.
     REQUIRED_PREFIX = 'static/'
@@ -219,7 +219,7 @@ class StaticHandler(webapp2.RequestHandler):
 
 
 class CalcHandler(StaticHandler):
-    SERVE_FROM_DIRECTORY = '.'
+    SERVE_FROM_DIRECTORY = os.path.dirname(__file__)
     REQUIRED_PREFIX = 'calc/'
 
     def get(self):
