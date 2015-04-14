@@ -38,11 +38,6 @@ def location_display_from_id(loc_id):
         return config.other_locs[loc_id] + "?!!"
     return "[%s]" % loc_id
 
-def location_display_from_comment(comment):
-    if "LSC" in comment: return "LSC4-P I"
-    if "VLG" in comment: return "VLGD-R III-2"
-    return "???"
-
 def timedelta_display(delta):
     # timedeltas are normalized like:
     # 0 <= microseconds < 1000000
@@ -97,7 +92,7 @@ class MainHandler(webapp2.RequestHandler):
                 if contract['type'] == 'Courier':
                     cn['to'] = location_display_from_id(contract['end'])
                 else:
-                    cn['to'] = location_display_from_comment(contract['title'])
+                    cn['to'] = "???"
 
                 # Accepter
                 if contract['accepted']:
