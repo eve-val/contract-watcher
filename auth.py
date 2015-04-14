@@ -1,3 +1,5 @@
+import webapp2_extras.auth
+
 from binascii import hexlify
 
 class Character(object):
@@ -12,11 +14,11 @@ class Character(object):
 
     @classmethod
     def get_by_auth_token(cls, user_id, token):
-        pass
+        return (None, None)
 
     @classmethod
     def get_by_auth_password(cls, auth_id, password):
-        pass
+        raise webapp2_extras.auth.InvalidPasswordError
 
     @classmethod
     def create_user(cls, auth_id, unique_properties=None, **user_values):
