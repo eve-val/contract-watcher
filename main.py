@@ -61,6 +61,7 @@ class MainHandler(webapp2.RequestHandler):
             if user is None:
                 return self.redirect('/login')
             if config.braveapi_perm_view not in user['perms']:
+                self.response.status = 403
                 self.response.write("permission denied :(")
                 return
 
@@ -188,24 +189,50 @@ class LogoutHandler(webapp2.RequestHandler):
 
 
 class StaticHandler(webapp2.RequestHandler):
+    # We'll try to find requested resource relative to this location (relative
+    # to directory this source file's in).
+    SERVE_FROM_DIRECTORY = 'static'
+    # Once we resolve a requested resource (relative to the directory this
+    # source file's in), the path must begin with this prefix.
+    REQUIRED_PREFIX = 'static/'
+
     """Try to have your frontend serve static assets instead of this. But, this
     is available for easy standalone operation."""
     def get_resource_path(self):
         """This is responsible for making sure that the requested resource
         refers to something inside the static directory."""
         path = self.request.path.lstrip('/')
-        abspath = os.path.abspath(os.path.join('static', path))
+        abspath = os.path.abspath(os.path.join(self.SERVE_FROM_DIRECTORY, path))
         relpath = os.path.relpath(abspath, os.path.dirname(__file__))
-        if not relpath.startswith('static/'):
+        if not relpath.startswith(self.REQUIRED_PREFIX):
             self.abort(404)
         return relpath
 
     def get(self):
         path = self.get_resource_path()
+        if not os.path.exists(path):
+            self.abort(404)
         # Let the browser guess the content type.
         self.response.content_type = None
         with open(path) as f:
             self.response.write(f.read())
+
+
+class CalcHandler(StaticHandler):
+    SERVE_FROM_DIRECTORY = '.'
+    REQUIRED_PREFIX = 'calc/'
+
+    def get(self):
+        if config.require_login:
+            auth = get_auth(self.request)
+            user = auth.get_user_by_session()
+            if user is None:
+                return self.redirect('/login')
+            if config.braveapi_perm_view not in user['perms']:
+                self.response.status = 403
+                self.response.write("permission denied :(")
+                return
+        return super(CalcHandler, self).get()
 
 
 app_config = {}
@@ -218,6 +245,7 @@ app = webapp2.WSGIApplication([
     ('/login', LoginHandler),
     ('/loginok', LoginResultHandler),
     ('/logout', LogoutHandler),
+    ('/calc/.*', CalcHandler),
     ('/css/.*', StaticHandler),
     ('/img/.*', StaticHandler),
     ('/js/.*', StaticHandler),
