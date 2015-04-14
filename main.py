@@ -30,43 +30,12 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)), 
     extensions=['jinja2.ext.autoescape'])
 
-# Ideally this would come from the corporation sheet, but we'd need a key with
-# that bit set.
-KNEES_ID = 98237970
-SLA_DAYS = 7
-
-# Ideally this would come from the CCP database dump, but thpppbbbtttt.
-# Constructed manually instead.
-supported_locs = {
-    60008494: "Amarr VIII",
-    60003616: "Dabrid V",
-    61000744: "4-07MU V",
-    60013957: "Parses",
-    60014940: "UHKL-N",
-}
-other_locs = {
-    60011824: "Orvolle I",
-    60011731: "Orvolle VI-1",
-    60012067: "Murethand VIII-2",
-    60009808: "Mesybier VII",
-    60013477: "VLGD-R III-2",
-    60014575: "Chardalane V",
-    60011728: "Adacyne III-14",
-    60006511: "Mendori IX - Moon 9 - Imperial Armaments Factory",
-    61000223: "KW-I6T VI",
-    60003760: "Jita IV-4",
-    60011725: "Adacyne IV-14",
-    60009940: "LSC4-P I",
-    60006262: "Rayl VIII-7",
-    61000682: "EX6-AO VII",
-}
-
 def location_display_from_id(loc_id):
     """Get the display name for the location."""
-    if loc_id in supported_locs:
-        return supported_locs[loc_id]
-    if loc_id in other_locs:
-        return other_locs[loc_id] + "?!!"
+    if loc_id in config.supported_locs:
+        return config.supported_locs[loc_id]
+    if loc_id in config.other_locs:
+        return config.other_locs[loc_id] + "?!!"
     return "[%s]" % loc_id
 
 def location_display_from_comment(comment):
@@ -109,7 +78,7 @@ class MainHandler(webapp2.RequestHandler):
         pending = []
         total_volume = 0.0
         for contract in contracts.result.itervalues():
-            if (contract['assignee'] == KNEES_ID and
+            if (contract['assignee'] == config.corp_id and
                 contract['status'] in ('Outstanding', 'InProgress') and
                 'opsec' not in contract['title'].lower()) :
                 cn = {}
@@ -137,7 +106,7 @@ class MainHandler(webapp2.RequestHandler):
                     cn['accepted'] = ""
 
                 # Time remaining
-                maxdays = datetime.timedelta(days=SLA_DAYS)
+                maxdays = datetime.timedelta(days=config.sla_days)
                 delta = date + maxdays - datetime.datetime.today()
                 cn['timedelta_remaining'] = delta
                 cn['remaining'] = timedelta_display(delta)
