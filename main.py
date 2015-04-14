@@ -206,7 +206,7 @@ class StaticHandler(webapp2.RequestHandler):
         relpath = os.path.relpath(abspath, os.path.dirname(__file__))
         if not relpath.startswith(self.REQUIRED_PREFIX):
             self.abort(404)
-        return relpath
+        return abspath
 
     def get(self):
         path = self.get_resource_path()
