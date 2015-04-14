@@ -20,9 +20,10 @@ get_evelink_cache=None
 host='127.0.0.1'
 port='8091'
 
-# Optional configuration. Include these cont 
+# Auth configuration
 require_login=True
 
+# The below auth configuration is only required if require_login is True.
 braveapi_endpoint='http://core.example.com/api'
 braveapi_my_privkey='................................................................'
 braveapi_my_pubkey='................................................................................................................................'
