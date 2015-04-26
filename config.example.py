@@ -8,6 +8,7 @@ vcode='some-really-long-verification-code'
 # Service configuration
 corp_id = 12345670
 sla_days = 7
+
 # Ideally this would come from the CCP database dump, but thpppbbbtttt.
 # Constructed manually instead.
 supported_locs = {
@@ -51,4 +52,6 @@ braveapi_server_pubkey='........................................................
 
 braveapi_perm_view='yourapp.view'
 
+# This is used for encrypting sessions, so you need to generate a random string here
+# and then protect it.
 session_secret_key='................................'
