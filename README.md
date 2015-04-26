@@ -16,13 +16,6 @@ interface with the EVE API:
     git clone https://github.com/eve-val/evelink.git evelink-repo
     ln -s evelink-repo/evelink
 
-It also expects [Eve Shipping
-Calc](https://github.com/kormat/eve-shipping-calc):
-
-    git clone https://github.com/kormat/eve-shipping-calc.git calc
-
-Configure calc/calc-config.js for your routes.
-
 Now create your configuration file by copying config.example.py to
 config.py and editing it as appropriate. For testing, you probably want
 to set `require_login` to be `False`, but production versions shoul

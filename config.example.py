@@ -27,6 +27,7 @@ other_locs = {
 
 # Docs link.
 doc_url='http://example.com/your-docs'
+calc_url='http://example.com/calc.html'
 
 # Evelink configuration.
 get_evelink_cache=None

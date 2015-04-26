@@ -119,6 +119,7 @@ class MainHandler(webapp2.RequestHandler):
 
         template = JINJA_ENVIRONMENT.get_template('index.html')
         self.response.write(template.render({'pending': pending,
+                                             'calc_url': config.calc_url,
                                              'doc_url': config.doc_url,
                                              'total_volume': "{:,.3f}".format(total_volume),
                                             }))
@@ -218,23 +219,6 @@ class StaticHandler(webapp2.RequestHandler):
             self.response.write(f.read())
 
 
-class CalcHandler(StaticHandler):
-    SERVE_FROM_DIRECTORY = os.path.dirname(__file__)
-    REQUIRED_PREFIX = 'calc/'
-
-    def get(self):
-        if config.require_login:
-            auth = get_auth(self.request)
-            user = auth.get_user_by_session()
-            if user is None:
-                return self.redirect('/login')
-            if config.braveapi_perm_view not in user['perms']:
-                self.response.status = 403
-                self.response.write("permission denied :(")
-                return
-        return super(CalcHandler, self).get()
-
-
 app_config = {}
 app_config['webapp2_extras.sessions'] = {
     'secret_key': config.session_secret_key,
@@ -245,7 +229,6 @@ app = webapp2.WSGIApplication([
     ('/login', LoginHandler),
     ('/loginok', LoginResultHandler),
     ('/logout', LogoutHandler),
-    ('/calc/.*', CalcHandler),
     ('/css/.*', StaticHandler),
     ('/img/.*', StaticHandler),
     ('/js/.*', StaticHandler),
